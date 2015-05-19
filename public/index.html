@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="zh-tw">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="MapPoint">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Parse App</title>
+
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+  	  <div class="col-md-3">
+  	    <h2>Map Point</h2>
+        <p class="text-success" id="globalSuccess"></p>
+        <p class="text-danger" id="globalFail"></p>
+        
+        <p>
+          <span id="welcome">歡迎</span>
+    	    <button type="button" class="btn btn-primary hidden" data-toggle="modal" data-target="#loginModal" id="btn-login">登入</button>
+          <button type="button" class="btn btn-primary hidden" id="btn-logout">登出</button>
+        </p>
+        
+        <hr/>
+        <form class="form-inline">
+          <div class="form-group">
+            <label for="new-map-name">新地圖</label>
+            <input type="text" class="form-control" id="new-map-name" placeholder="名稱">
+          </div>
+          <button type="button" class="btn btn-default" id="create-new-map">建立</button>
+        </form>
+        <hr/>
+        
+        <h4>我製作的地圖</h4>
+        <ul id="myMapList">
+          <li>無</li>
+        </ul>
+  	  </div>
+  		
+  	  <div class="col-md-9">
+        <div class="row">
+          <div class="col-xs-6">
+            <h4>
+              <small>地圖標題</small> <span id="targetMapName"></span>
+            </h4>
+          </div>
+          <div class="col-xs-3">
+            <h4>
+              <small>作者</small> <span id="targetMapAuthorName"></span>
+            </h4> 
+          </div>
+          <div class="col-xs-3">
+            <button type="button" class="btn btn-primary hidden" id="create-new-point" data-toggle="modal" data-target="#newPointModal">新增地點</button>
+          </div>
+        </div>
+        
+        <hr/>
+
+        <div class="table-responsive">
+          <table class="table" id="tblMapPoint">
+            <thead>
+              <tr>
+                <th>id</th>
+                <th>地點名稱</th>
+                <th>地址</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+  	  </div>
+      
+  	</div>
+  </div>
+
+<!-- loginModal -->
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="loginModalLabel">歡迎加入</h4>
+      </div>
+      <div class="modal-body">
+        
+        <ul class="nav nav-pills nav-justified" id="tab-login">
+          <li class="active"><a data-toggle="tab" href="#content-login">登入</a></li>
+          <li><a data-toggle="tab" href="#content-register">註冊</a></li>
+          <li><a data-toggle="tab" href="#content-forget-pw">忘記密碼</a></li>
+        </ul>
+        <hr/>
+        
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="content-login">
+            <form id="frm-login">
+              <div class="form-group">
+                <input type="text" class="form-control" id="login-user-name" placeholder="帳號">
+              </div>
+              <div class="form-group">
+                <input type="password" class="form-control" id="login-user-password" placeholder="密碼">
+              </div>
+            </form>
+          </div>
+          
+          <div role="tabpanel" class="tab-pane" id="content-register">
+            <form id="frm-reg">
+              <div class="form-group">
+                <input type="text" class="form-control" id="reg-user-name" placeholder="帳號">
+              </div>
+              <div class="form-group">
+                <input type="email" class="form-control" id="reg-user-email" placeholder="請填入有效信箱，忘記密碼時以該信箱為補發">
+              </div>
+              <div class="form-group">
+                <input type="password" class="form-control" id="reg-user-password" placeholder="密碼">
+              </div>
+              <div class="form-group">
+                <input type="password" class="form-control" id="reg-user-re-password" placeholder="再次確認密碼">
+              </div>
+            </form>
+          </div>
+          
+          <div role="tabpanel" class="tab-pane" id="content-forget-pw">
+            <form id="frm-forget-pw">
+              <div class="form-group">
+                <input type="email" class="form-control" id="forget-pw-email" placeholder="註冊時填寫的信箱">
+              </div>
+            </form>
+          </div>
+        </div>
+        
+        <p class="text-danger hidden" id="loginErr"></p>
+          
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="btn-send-form">送出</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- newPointModal -->
+<div class="modal fade" id="newPointModal" tabindex="-1" role="dialog" aria-labelledby="newPointModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="newPointModalLabel">新增地點</h4>
+      </div>
+      
+      <div class="modal-body">
+        <form id="frm-login">
+          <div class="form-group">
+            <input type="text" class="form-control" id="point-name" placeholder="地點名稱">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" id="point-addr" placeholder="地址">
+          </div>
+        </form>
+        
+        <p class="text-danger hidden" id="newPointErr"></p>
+          
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="btn-send-point">送出</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.4.2.min.js"></script>
+<script type="text/javascript">
+  Parse.initialize("o9KGSSrLbufB0vS4ITSD0sUwKGH6skSOyxIDqZll", "FXUCFWd0GAEw04yq12w05gmfIePjzxpJoYRJNGtA");
+  
+  //初始地圖
+  var gMapId = getUrlVars()["mapId"] || null;
+  
+  (function($) {
+    var $loginModal = $("#loginModal");
+    
+    //初始用戶狀態
+    var currentUser = Parse.User.current();
+    
+    // 收起 modal 時
+    $('.modal').on('hidden.bs.modal', function(){
+      var $modal = $(this);
+      var modalFormList = $modal.find('form');
+      for (var i=0; i<modalFormList.length; i++) {
+        modalFormList[i].reset();
+      }
+      // 登入modal 關閉前要將狀態切回去
+      if($modal.attr("id") == "loginModal") {
+        $modal.find("ul li:nth-child(1) a").tab('show');
+        $modal.find("#loginErr").addClass("hidden").text("");
+      } else {
+        $modal.find("#newPointErr").addClass("hidden").text("");
+      }
+    });
+    
+    // 提交 登入/註冊/忘記密碼
+    $("#btn-send-form").click(function(){      
+      var activeTabText = $("ul#tab-login li.active a").text();
+      var $frm = $loginModal.find("div.tab-pane.active form");
+      
+      if(activeTabText == "登入") {
+        Parse.User.logIn($frm.find("#login-user-name").val(), $frm.find("#login-user-password").val(), {
+          success: function(user) {
+            $loginModal.modal('hide');
+            location.reload();
+          },
+          error: function(user, error) {
+            $loginModal.find("#loginErr").text("錯誤: [" + error.code + "] " + error.message).removeClass("hidden");
+          }
+        });
+        
+      } else if(activeTabText == "註冊") {
+        var user = new Parse.User();
+        var name = $frm.find("#reg-user-name").val();
+        var email = $frm.find("#reg-user-email").val();
+        var pw = $frm.find("#reg-user-password").val();
+        if(pw === $frm.find("#reg-user-re-password").val()){
+          user.set("username", name);
+          user.set("email", email);
+          user.set("password", pw);
+                  
+          user.signUp(null, {
+            success: function(user) {
+              $loginModal.modal('hide');
+              location.reload();           
+            },
+            error: function(user, error) {
+              $loginModal.find("#loginErr").text("錯誤: [" + error.code + "] " + error.message).removeClass("hidden");
+            }
+          });
+        }else{
+          $loginModal.find("#loginErr").text("密碼不一致，請重新輸入").removeClass("hidden").stop()
+            .find("#reg-user-password, #reg-user-re-password").val("");
+        }
+        
+      } else if(activeTabText == "忘記密碼") {
+        var email = $frm.find("#forget-pw-email").val();
+        
+        Parse.User.requestPasswordReset(email, {
+          success: function() {
+            $loginModal.modal('hide');
+            setGlobalMsg(true, "忘記密碼 已處理 請至信箱收信");
+          },
+          error: function(error) {
+            $loginModal.find("#loginErr").text("錯誤: [" + error.code + "] " + error.message).removeClass("hidden");
+          }
+        });
+      }
+    });
+    
+    // 登出
+    $("#btn-logout").click(function() {
+      Parse.User.logOut();
+      location.reload();
+    });
+    
+    // 忘記密碼
+    $("#forget-pw").click(function() {
+      Parse.User.requestPasswordReset("email@example.com", {
+        success: function() {
+          setGlobalMsg(true, "忘記密碼 成功，請至信箱收信");
+        },
+        error: function(error) {
+          setGlobalMsg(false, "忘記密碼 失敗", error);
+        }
+      });
+    });
+    
+    // 新增地圖
+    $("#create-new-map").click(function(){
+      var MyMap = Parse.Object.extend("MyMap");
+      var myMap = new MyMap();
+      myMap.set("name", $("#new-map-name").val());
+      myMap.set("author", currentUser);
+      
+      var myMapACL = new Parse.ACL(currentUser);
+      myMapACL.setPublicReadAccess(true);
+      myMap.setACL(myMapACL);
+      myMap.save(null, {
+        success: function(object){
+          setGlobalMsg(true, "新增地圖 成功 "+object.id);
+          window.location.href = '?mapId='+object.id;
+        },
+        error: function(model, error) {
+          setGlobalMsg(false, "新增地圖 失敗", error);
+        }
+      });
+      
+    });
+    
+    // 新增地點
+    $("#btn-send-point").click(function(){
+      var MapPoint = Parse.Object.extend("MapPoint");
+      var mapPoint = new MapPoint();
+      
+      mapPoint.set("name", $("#point-name").val());
+      mapPoint.set("addr", $("#point-addr").val());
+      mapPoint.set("map", gMapId);// 用 id 存關聯
+      
+      var myACL = new Parse.ACL(currentUser);
+      myACL.setPublicReadAccess(true);
+      mapPoint.setACL(myACL);
+      
+      mapPoint.save(null, {
+        success: function(object){
+          setGlobalMsg(true, "新增地點 成功 "+object.id);
+          addPoint(object);
+          $("#newPointModal").modal('hide');
+        },
+        error: function(model, error) {
+          $("#newPointErr").text("錯誤: [" + error.code + "] " + error.message).removeClass("hidden");
+        }
+      });
+      
+    });
+    
+    // -------------------------------------
+    initPage(gMapId);
+    setUserStatusUI(currentUser);
+    
+  })(jQuery);
+  
+  // 註冊/登入 後
+  function afterLogin(user){
+    setUserStatusUI(user);
+  }
+
+  // 初始化地圖頁面
+  function initPage(mapId) {
+    Parse.Cloud.run('initPage', { mapId: mapId }, {
+      success: function(result) {
+        setGlobalMsg(true, "初始頁面成功");
+        
+        var userMapInfoList = result.userMapInfoList;
+        var mapLiNodes = [];
+        gMapId = result.targetMapId;
+        for (var i=0; i<userMapInfoList.length; i++) {
+          if(userMapInfoList[i].mapId == result.targetMapId) {
+            mapLiNodes.push(
+              $('<li>').append(userMapInfoList[i].name)
+            );
+          } else {
+            mapLiNodes.push(
+              $('<li>').append(
+                  $('<a>').attr('href','?mapId='+userMapInfoList[i].mapId)
+                    .text(userMapInfoList[i].name)
+            ));
+          }
+        }
+        if(mapLiNodes.length) {
+          $("#myMapList").html(mapLiNodes);
+        }
+        
+        $("#targetMapName").text(result.targetMapName);
+        $("#targetMapAuthorName").text(result.targetMapAuthorName);
+        
+        for(var i=0; i<result.points.length; i++) {
+          addPoint(result.points[i]);
+        }
+        
+        if(result.editable){
+          $("#create-new-point").removeClass("hidden");
+        } else {
+          $("#create-new-point").addClass("hidden");
+        }
+      },
+      error: function(error) {
+        setGlobalMsg(false, "初始頁面失敗", error);
+      }
+    });
+  }
+  
+  // 初始頁面 使用者狀態 相關UI 登入/登出，歡迎詞
+  function setUserStatusUI(currentUser) {
+    if (currentUser) {
+      $("#welcome").text(currentUser.get("username") + ", 您好~ ");
+      
+      $("#btn-login").addClass("hidden");
+      $("#btn-logout").removeClass("hidden");
+    } else {
+      $("#welcome").text("Guest，歡迎~ ");
+      
+      $("#btn-login").removeClass("hidden");
+      $("#btn-logout").addClass("hidden");
+    }
+  }
+  
+  function getUrlVars()
+  {
+    var vars = [], hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    for(var i = 0; i < hashes.length; i++)
+    {
+      hash = hashes[i].split('=');
+      vars.push(hash[0]);
+      vars[hash[0]] = hash[1];
+    }
+    return vars;
+  }
+  
+  function setGlobalMsg(isSuccess, msg, error) {
+    if(isSuccess) {
+      $("#globalSuccess").text(msg);
+    } else if(error) {
+      $("#globalFail").text(msg + " [" + error.code + "] " + error.message);
+    } else {
+      $("#globalFail").text(msg);
+    }
+    //.fadeOut(1600);
+  }
+  
+  function addPoint(pointObj){
+    $("#tblMapPoint tbody").append( "<tr>"+
+      "<td>"+pointObj.id+"</td>"+ 
+      "<td>"+pointObj.get("name")+"</td>"+ 
+      "<td>"+pointObj.get("addr")+"</td>"+
+    "</tr>");
+  };
+  
+</script>
+
+</body>
+
+</html>

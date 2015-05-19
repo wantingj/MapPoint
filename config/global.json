@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "MapPoint": {
+            "applicationId": "o9KGSSrLbufB0vS4ITSD0sUwKGH6skSOyxIDqZll", 
+            "masterKey": "wQSPl4oyWJ0eUOu5Mmxq5Eo4d9W7df26snGMFWMJ"
+        }, 
+        "_default": {
+            "link": "MapPoint"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.4.2"
+    }
+}
